@@ -71,7 +71,7 @@ create_document() {
 }
 
 open_document() {
-    FILE=$(find "$directory" -type f -name "*.pdf" -printf "%f\n" | $Menu "Select PDF:")
+  FILE=$(find "$directory" -type f \( -name "*.epub" -o -name "*.pdf"  \)  -printf "%f\n" | $Menu "Select Document:")
     if [[ -n "$FILE" ]]; then
         FULL_PATH=$(find "$directory" -type f -name "$FILE" -print -quit)
         $VIEW "$FULL_PATH"
