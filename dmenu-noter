@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-EDITOR=nvim
+EDITOR=${EDITOR:-nvim}
 VIEW=zathura
 TERMINAL=${TERMINAL:-kitty}
 Menu="dmenu -c -p"
