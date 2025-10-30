@@ -1,9 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 EDITOR=nvim
 VIEW=zathura
-TERMINAL=kitty
-THEME=spotlight-dark
+TERMINAL=${TERMINAL:-kitty}
 
 # <<------ Directories ------>> #
 book_library="/path/to/books/"
@@ -100,7 +99,7 @@ download_books() {
 
 main() {
   selected_action=$(printf '%s\n' "${!actions[@]}" | rofi -dmenu -i -p "📂 Choose an action:" -theme $THEME)
-  
+
   if [ -z "$selected_action" ]; then
     exit 0
   fi
