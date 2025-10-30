@@ -11,6 +11,12 @@ note_library="/path/to/notes/"
 template_library="/path/to/note/templates/"
 article_library="/path/to/articles/"
 
+# <<------ Sync ------>> #
+user=johndoe123
+port=8080
+storage=/mnt/data/sync_folder
+server=backup-server.example.com
+
 # <<------ Options ------>> #
 declare -A actions
 actions["📑 Create Note"]=$template_library
@@ -83,6 +89,16 @@ edit_notes() {
   if [[ -n "$FILE" ]]; then
     FULL_PATH=$(find "$directory" -type f -name "$FILE" -print -quit)
     $TERMINAL -e "$EDITOR" "$FULL_PATH"
+  fi
+}
+
+sync_notes() {
+  if ping -c1 -W5 "$server" >/dev/null 2>&1; then
+    rsync -rtu -e "ssh -p $port" "$note_library"/* "$user@$server:$storage"
+    rsync -rtu -e "ssh -p $port" "$user@$server:$storage"/* "$note_library"
+    notify-send --icon="folder-sync" "The notes have been synchronized"
+  else
+    notify-send --icon="script-error" "The notes could not be synchronized"
   fi
 }
 
