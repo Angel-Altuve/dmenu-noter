@@ -3,6 +3,7 @@
 EDITOR=nvim
 VIEW=zathura
 TERMINAL=${TERMINAL:-kitty}
+Menu="dmenu -c -p"
 
 # <<------ Directories ------>> #
 book_library="/path/to/books/"
@@ -20,7 +21,7 @@ actions["⏬ Download Books"]="download_books"
 
 # <<------ Main ------>> #
 create_document() {
-  document_type=$(echo -e "Basic\nLaTeX\nBeamer\nRmark" | rofi -dmenu -i -p "What kind of note?" -theme $THEME)
+  document_type=$(echo -e "Basic\nLaTeX\nBeamer\nRmark" | $Menu "What kind of note?")
 
   if [ -z "$document_type" ]; then
     return
@@ -53,14 +54,14 @@ create_document() {
       ;;
   esac
 
-  cn_name=$(rofi -dmenu -p "Enter a name for the note:" -theme $THEME)
+  cn_name=$(rofi -dmenu -p "Enter a name for the note:")
 
   if [ -z "$cn_name" ]; then
     return
   fi
 
   if [ -f "$directory/$cn_name.$EXTENSION" ]; then
-    if ! (echo -e "Yes\nNo" | rofi -dmenu -p "Note already exists. Overwrite?" -theme $THEME | grep -q "Yes"); then
+    if ! (echo -e "Yes\nNo" | $Menu "Note already exists. Overwrite?"| grep -q "Yes"); then
       return
     fi
   fi
@@ -71,7 +72,7 @@ create_document() {
 }
 
 open_document() {
-    FILE=$(find "$directory" -type f -name "*.pdf" -printf "%f\n" | rofi -theme $THEME -dmenu -i -p "Select PDF:")
+    FILE=$(find "$directory" -type f -name "*.pdf" -printf "%f\n" | $Menu "Select PDF:")
     if [[ -n "$FILE" ]]; then
         FULL_PATH=$(find "$directory" -type f -name "$FILE" -print -quit)
         zathura "$FULL_PATH"
@@ -79,7 +80,7 @@ open_document() {
 }
 
 edit_notes() {
-    FILE=$(find "$directory" -type f -name "*.md" -printf "%f\n" | rofi -theme $THEME -dmenu -i -p "Select Note:")
+    FILE=$(find "$directory" -type f -name "*.md" -printf "%f\n" | $Menu "Select Note:")
     if [[ -n "$FILE" ]]; then
         FULL_PATH=$(find "$directory" -type f -name "$FILE" -print -quit)
         $TERMINAL -e $EDITOR "$FULL_PATH"
@@ -87,7 +88,7 @@ edit_notes() {
 }
 
 download_books() {
-  bookname=$(echo "" | rofi -dmenu -p "Enter book name:" -theme $THEME)
+  bookname=$(echo "" | rofi -dmenu -p "Enter book name:")
   if [ -z "$bookname" ]
   then
       echo "No book name entered"
@@ -98,7 +99,7 @@ download_books() {
 }
 
 main() {
-  selected_action=$(printf '%s\n' "${!actions[@]}" | rofi -dmenu -i -p "📂 Choose an action:" -theme $THEME)
+  selected_action=$(printf '%s\n' "${!actions[@]}" | $Menu "📂 Choose an action:")
 
   if [ -z "$selected_action" ]; then
     exit 0
