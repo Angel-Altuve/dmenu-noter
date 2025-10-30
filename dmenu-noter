@@ -106,20 +106,18 @@ sync_notes() {
 }
 
 edit_diary() {
-  DIARY_TEMPDIR="$(mktemp -d -t diary-XXXXXX)"
+  DIARY_TEMPDIR="$(mktemp -t diary-XXXXXX)"
 
-  gpg_user=$(gpg --list-secret-keys --keyid-format=long | awk '/uid/ {print $NF}')
-
-  choice=$(printf "%s\n" "$gpg_user" | $MENU "Select Key: ")
+  choice=$(gpg --list-secret-keys --keyid-format=long | awk '/uid/ {print $NF}' | sort | $MENU "Select Key: ")
   [ -n "$choice" ] || exit 1
 
   if [ -f "$diary" ]; then
-    gpg -q --yes --decrypt --recipient "$gpg_user" -o "$DIARY_TEMPDIR" "$diary" || exit 1
+    gpg -q --yes --decrypt --recipient "$choice" -o "$DIARY_TEMPDIR" "$diary" || exit 1
   else
     touch "$DIARY_TEMPDIR"
   fi
 
-  "$EDITOR" "$DIARY_TEMPDIR" || exit 1
+  $TERMINAL -e "$EDITOR" "$DIARY_TEMPDIR" || exit 1
   gpg -q --yes --encrypt --recipient "$choice" -o "$diary" "$DIARY_TEMPDIR" || exit 1
   rm -f "$DIARY_TEMPDIR"
 }
