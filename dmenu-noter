@@ -27,30 +27,30 @@ create_document() {
   fi
 
   case "$document_type" in
-    Basic)
-      template="SimpleNote.md"
-      EXTENSION="md"
-      message="Basic Document Created!"
-      ;;
-    LaTeX)
-      template="LaTeX.tex"
-      EXTENSION="tex"
-      message="LaTeX Document Created!"
-      ;;
-    Beamer)
-      template="Presentation.tex"
-      EXTENSION="tex"
-      message="Beamer Presentation Created!"
-      ;;
-    Rmark)
-      template="RMarkdown.rmd"
-      EXTENSION="rmd"
-      message="R Markdown Document Created!"
-      ;;
-    *)
-      echo "Invalid option"
-      return 1
-      ;;
+  Basic)
+    template="SimpleNote.md"
+    EXTENSION="md"
+    message="Basic Document Created!"
+    ;;
+  LaTeX)
+    template="LaTeX.tex"
+    EXTENSION="tex"
+    message="LaTeX Document Created!"
+    ;;
+  Beamer)
+    template="Presentation.tex"
+    EXTENSION="tex"
+    message="Beamer Presentation Created!"
+    ;;
+  Rmark)
+    template="RMarkdown.rmd"
+    EXTENSION="rmd"
+    message="R Markdown Document Created!"
+    ;;
+  *)
+    echo "Invalid option"
+    return 1
+    ;;
   esac
 
   cn_name=$($Menu "Enter a name for the note:")
@@ -60,7 +60,7 @@ create_document() {
   fi
 
   if [ -f "$directory/$cn_name.$EXTENSION" ]; then
-    if ! (echo -e "Yes\nNo" | $Menu "Note already exists. Overwrite?"| grep -q "Yes"); then
+    if ! (echo -e "Yes\nNo" | $Menu "Note already exists. Overwrite?" | grep -q "Yes"); then
       return
     fi
   fi
@@ -71,19 +71,19 @@ create_document() {
 }
 
 open_document() {
-  FILE=$(find "$directory" -type f \( -name "*.epub" -o -name "*.pdf"  \)  -printf "%f\n" | $Menu "Select Document:")
-    if [[ -n "$FILE" ]]; then
-        FULL_PATH=$(find "$directory" -type f -name "$FILE" -print -quit)
-        $VIEW "$FULL_PATH"
-    fi
+  FILE=$(find "$directory" -type f \( -name "*.epub" -o -name "*.pdf" \) -printf "%f\n" | $Menu "Select Document:")
+  if [[ -n "$FILE" ]]; then
+    FULL_PATH=$(find "$directory" -type f -name "$FILE" -print -quit)
+    $VIEW "$FULL_PATH"
+  fi
 }
 
 edit_notes() {
-    FILE=$(find "$directory" -type f -name "*.md" -printf "%f\n" | $Menu "Select Note:")
-    if [[ -n "$FILE" ]]; then
-        FULL_PATH=$(find "$directory" -type f -name "$FILE" -print -quit)
-        $TERMINAL -e $EDITOR "$FULL_PATH"
-    fi
+  FILE=$(find "$directory" -type f -name "*.md" -printf "%f\n" | $Menu "Select Note:")
+  if [[ -n "$FILE" ]]; then
+    FULL_PATH=$(find "$directory" -type f -name "$FILE" -print -quit)
+    $TERMINAL -e "$EDITOR" "$FULL_PATH"
+  fi
 }
 
 main() {
@@ -100,15 +100,15 @@ main() {
   else
     directory="$selected_dir_or_func"
     case $selected_action in
-      "📑 Create Note")
-        create_document
-        ;;
-      "🔖 View Notes")
-        edit_notes
-        ;;
-      "📚 Books" | "📜 Articles")
-        open_document
-        ;;
+    "📑 Create Note")
+      create_document
+      ;;
+    "🔖 View Notes")
+      edit_notes
+      ;;
+    "📚 Books" | "📜 Articles")
+      open_document
+      ;;
     esac
   fi
 }
