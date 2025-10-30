@@ -3,13 +3,14 @@
 EDITOR=${EDITOR:-nvim}
 VIEW=zathura
 TERMINAL=${TERMINAL:-kitty}
-Menu="dmenu -c -p"
+MENU="dmenu -c -p"
 
 # <<------ Directories ------>> #
 book_library="/path/to/books/"
 note_library="/path/to/notes/"
 template_library="/path/to/note/templates/"
 article_library="/path/to/articles/"
+diary="/path/to/diary/"
 
 # <<------ Sync ------>> #
 user=johndoe123
@@ -24,10 +25,11 @@ actions["🔖 View Notes"]=$note_library
 actions["📚 Books"]=$book_library
 actions["📜 Articles"]=$article_library
 actions["  Sync"]=$note_library
+actions["󰌱  Diary"]=$diary
 
 # <<------ Main ------>> #
 create_document() {
-  document_type=$(echo -e "Basic\nLaTeX\nBeamer\nRmark" | $Menu "What kind of note?")
+  document_type=$(echo -e "Basic\nLaTeX\nBeamer\nRmark" | $MENU "What kind of note?")
 
   if [ -z "$document_type" ]; then
     return
@@ -60,14 +62,14 @@ create_document() {
     ;;
   esac
 
-  cn_name=$($Menu "Enter a name for the note:")
+  cn_name=$($MENU "Enter a name for the note:")
 
   if [ -z "$cn_name" ]; then
     return
   fi
 
   if [ -f "$directory/$cn_name.$EXTENSION" ]; then
-    if ! (echo -e "Yes\nNo" | $Menu "Note already exists. Overwrite?" | grep -q "Yes"); then
+    if ! (echo -e "Yes\nNo" | $MENU "Note already exists. Overwrite?" | grep -q "Yes"); then
       return
     fi
   fi
@@ -78,7 +80,7 @@ create_document() {
 }
 
 open_document() {
-  FILE=$(find "$directory" -type f \( -name "*.epub" -o -name "*.pdf" \) -printf "%f\n" | $Menu "Select Document:")
+  FILE=$(find "$directory" -type f \( -name "*.epub" -o -name "*.pdf" \) -printf "%f\n" | $MENU "Select Document:")
   if [[ -n "$FILE" ]]; then
     FULL_PATH=$(find "$directory" -type f -name "$FILE" -print -quit)
     $VIEW "$FULL_PATH"
@@ -86,7 +88,7 @@ open_document() {
 }
 
 edit_notes() {
-  FILE=$(find "$directory" -type f -name "*.md" -printf "%f\n" | $Menu "Select Note:")
+  FILE=$(find "$directory" -type f -name "*.md" -printf "%f\n" | $MENU "Select Note:")
   if [[ -n "$FILE" ]]; then
     FULL_PATH=$(find "$directory" -type f -name "$FILE" -print -quit)
     $TERMINAL -e "$EDITOR" "$FULL_PATH"
@@ -103,8 +105,27 @@ sync_notes() {
   fi
 }
 
+edit_diary() {
+  DIARY_TEMPDIR="$(mktemp -d -t diary-XXXXXX)"
+
+  gpg_user=$(gpg --list-secret-keys --keyid-format=long | awk '/uid/ {print $NF}')
+
+  choice=$(printf "%s\n" "$gpg_user" | $MENU "Select Key: ")
+  [ -n "$choice" ] || exit 1
+
+  if [ -f "$diary" ]; then
+    gpg -q --yes --decrypt --recipient "$gpg_user" -o "$DIARY_TEMPDIR" "$diary" || exit 1
+  else
+    touch "$DIARY_TEMPDIR"
+  fi
+
+  "$EDITOR" "$DIARY_TEMPDIR" || exit 1
+  gpg -q --yes --encrypt --recipient "$choice" -o "$diary" "$DIARY_TEMPDIR" || exit 1
+  rm -f "$DIARY_TEMPDIR"
+}
+
 main() {
-  selected_action=$(printf '%s\n' "${!actions[@]}" | $Menu "📂 Choose an action:")
+  selected_action=$(printf '%s\n' "${!actions[@]}" | $MENU "📂 Choose an action:")
 
   if [ -z "$selected_action" ]; then
     exit 0
@@ -128,6 +149,9 @@ main() {
       ;;
     "  Sync")
       sync_notes
+      ;;
+    "󰌱  Diary")
+      open_diary
       ;;
     esac
   fi
