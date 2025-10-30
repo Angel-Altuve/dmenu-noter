@@ -3,7 +3,7 @@
 EDITOR=${EDITOR:-nvim}
 VIEW=zathura
 TERMINAL=${TERMINAL:-kitty}
-MENU="dmenu -c -p"
+MENU="dmenu -c -l 10 -p"
 
 # <<------ Directories ------>> #
 book_library="/path/to/books/"
@@ -75,7 +75,7 @@ create_document() {
   fi
 
   notify-send "$message"
-  cp "$directory/Templates/$template" "$directory/$cn_name.$EXTENSION"
+  [ -d "$directory" ] && cp "$directory/Templates/$template" "$directory/$cn_name.$EXTENSION"
   "$TERMINAL" -e "$EDITOR" "$directory/$cn_name.$EXTENSION"
 }
 
@@ -83,7 +83,7 @@ open_document() {
   FILE=$(find "$directory" -type f \( -name "*.epub" -o -name "*.pdf" \) -printf "%f\n" | $MENU "Select Document:")
   if [[ -n "$FILE" ]]; then
     FULL_PATH=$(find "$directory" -type f -name "$FILE" -print -quit)
-    $VIEW "$FULL_PATH"
+    [ -f "$FULL_PATH" ] && $VIEW "$FULL_PATH"
   fi
 }
 
@@ -91,17 +91,17 @@ edit_notes() {
   FILE=$(find "$directory" -type f -name "*.md" -printf "%f\n" | $MENU "Select Note:")
   if [[ -n "$FILE" ]]; then
     FULL_PATH=$(find "$directory" -type f -name "$FILE" -print -quit)
-    $TERMINAL -e "$EDITOR" "$FULL_PATH"
+    [ -f "$FULL_PATH" ] && $TERMINAL -e "$EDITOR" "$FULL_PATH"
   fi
 }
 
 sync_notes() {
   if ping -c1 -W5 "$server" >/dev/null 2>&1; then
-    rsync -rtu -e "ssh -p $port" "$note_library"/* "$user@$server:$storage"
-    rsync -rtu -e "ssh -p $port" "$user@$server:$storage"/* "$note_library"
+    rsync -rtu -e "ssh -p $port" "$note_library"/* "$user@$server:$storage" || notify-send --icon="script-error" "The notes could not be synchronized"
+    rsync -rtu -e "ssh -p $port" "$user@$server:$storage"/* "$note_library" || exit 1
     notify-send --icon="folder-sync" "The notes have been synchronized"
   else
-    notify-send --icon="script-error" "The notes could not be synchronized"
+    notify-send --icon="script-error" "server unavailable"
   fi
 }
 
@@ -133,28 +133,24 @@ main() {
 
   selected_dir_or_func="${actions[$selected_action]}"
 
-  if [ "$selected_dir_or_func" = "download_books" ]; then
-    $selected_dir_or_func
-  else
-    directory="$selected_dir_or_func"
-    case $selected_action in
-    "📑 Create Note")
-      create_document
-      ;;
-    "🔖 View Notes")
-      edit_notes
-      ;;
-    "📚 Books" | "📜 Articles")
-      open_document
-      ;;
-    "  Sync")
-      sync_notes
-      ;;
-    "󰌱  Diary")
-      open_diary
-      ;;
-    esac
-  fi
+  directory="$selected_dir_or_func"
+  case $selected_action in
+  "📑 Create Note")
+    create_document
+    ;;
+  "🔖 View Notes")
+    edit_notes
+    ;;
+  "📚 Books" | "📜 Articles")
+    open_document
+    ;;
+  "  Sync")
+    sync_notes
+    ;;
+  "󰌱  Diary")
+    open_diary
+    ;;
+  esac
 }
 
 main
