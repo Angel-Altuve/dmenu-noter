@@ -17,7 +17,6 @@ actions["📑 Create Note"]=$template_library
 actions["🔖 View Notes"]=$note_library
 actions["📚 Books"]=$book_library
 actions["📜 Articles"]=$article_library
-actions["⏬ Download Books"]="download_books"
 
 # <<------ Main ------>> #
 create_document() {
@@ -54,7 +53,7 @@ create_document() {
       ;;
   esac
 
-  cn_name=$(rofi -dmenu -p "Enter a name for the note:")
+  cn_name=$($Menu "Enter a name for the note:")
 
   if [ -z "$cn_name" ]; then
     return
@@ -75,7 +74,7 @@ open_document() {
     FILE=$(find "$directory" -type f -name "*.pdf" -printf "%f\n" | $Menu "Select PDF:")
     if [[ -n "$FILE" ]]; then
         FULL_PATH=$(find "$directory" -type f -name "$FILE" -print -quit)
-        zathura "$FULL_PATH"
+        $VIEW "$FULL_PATH"
     fi
 }
 
@@ -85,17 +84,6 @@ edit_notes() {
         FULL_PATH=$(find "$directory" -type f -name "$FILE" -print -quit)
         $TERMINAL -e $EDITOR "$FULL_PATH"
     fi
-}
-
-download_books() {
-  bookname=$(echo "" | rofi -dmenu -p "Enter book name:")
-  if [ -z "$bookname" ]
-  then
-      echo "No book name entered"
-      exit 1
-  fi
-
-  kitty -T "dropbooks" -e libby --rofi $bookname
 }
 
 main() {
