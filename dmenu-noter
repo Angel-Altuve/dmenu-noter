@@ -23,6 +23,7 @@ actions["📑 Create Note"]=$template_library
 actions["🔖 View Notes"]=$note_library
 actions["📚 Books"]=$book_library
 actions["📜 Articles"]=$article_library
+actions["  Sync"]=$note_library
 
 # <<------ Main ------>> #
 create_document() {
