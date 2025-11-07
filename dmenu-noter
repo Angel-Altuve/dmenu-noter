@@ -75,16 +75,16 @@ create_document() {
     fi
   fi
 
-  notify-send "$message"
+  notify-send --icon="document-new" "$message"
   [ -d "$directory" ] && cp "$directory/Templates/$template" "$directory/$cn_name.$EXTENSION"
-  "$TERMINAL" -e "$EDITOR" "$directory/$cn_name.$EXTENSION"
+  setsid -f "$TERMINAL" -e "$EDITOR" "$directory/$cn_name.$EXTENSION" >/dev/null 2>&1
 }
 
 open_document() {
   FILE=$(find "$directory" -type f \( -name "*.epub" -o -name "*.pdf" \) -printf "%f\n" | $MENU "Select Document:")
   if [[ -n "$FILE" ]]; then
     FULL_PATH=$(find "$directory" -type f -name "$FILE" -print -quit)
-    [ -f "$FULL_PATH" ] && $VIEW "$FULL_PATH"
+    [ -f "$FULL_PATH" ] && setsid -f $VIEW "$FULL_PATH"
   fi
 }
 
@@ -92,7 +92,7 @@ edit_notes() {
   FILE=$(find "$directory" -type f -name "*.md" -printf "%f\n" | $MENU "Select Note:")
   if [[ -n "$FILE" ]]; then
     FULL_PATH=$(find "$directory" -type f -name "$FILE" -print -quit)
-    [ -f "$FULL_PATH" ] && $TERMINAL -e "$EDITOR" "$FULL_PATH"
+    [ -f "$FULL_PATH" ] && setsid -f "$TERMINAL" -e "$EDITOR" "$FULL_PATH"
   fi
 }
 
@@ -122,7 +122,7 @@ edit_diary() {
     touch "$DIARY_TEMPDIR"
   fi
 
-  $TERMINAL -e "$EDITOR" "$DIARY_TEMPDIR" || exit 1
+  setsid -f "$TERMINAL" -e "$EDITOR" "$DIARY_TEMPDIR" || exit 1
   gpg -q --yes --encrypt --recipient "$choice" -o "$diary" "$DIARY_TEMPDIR" || exit 1
   rm -f "$DIARY_TEMPDIR"
 }
