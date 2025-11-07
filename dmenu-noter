@@ -11,6 +11,7 @@ note_library="/path/to/notes/"
 template_library="/path/to/note/templates/"
 article_library="/path/to/articles/"
 diary="/path/to/diary/"
+todo_list="/path/to/todo_list"
 
 # <<------ Sync ------>> #
 user=johndoe123
@@ -26,6 +27,7 @@ actions["📚 Books"]=$book_library
 actions["📜 Articles"]=$article_library
 actions["  Sync"]=$note_library
 actions["󰌱  Diary"]=$diary
+actions["  Todo list"]=$todo_list
 
 # <<------ Main ------>> #
 create_document() {
@@ -95,6 +97,10 @@ edit_notes() {
   fi
 }
 
+edit_todo() {
+  setsid -f "$TERMINAL" -e "$EDITOR" "$todo_list"
+}
+
 sync_notes() {
   if ping -c1 -W5 "$server" >/dev/null 2>&1; then
     rsync -rtu -e "ssh -p $port" "$note_library"/* "$user@$server:$storage" || notify-send --icon="script-error" "The notes could not be synchronized"
@@ -147,6 +153,9 @@ main() {
     ;;
   "󰌱  Diary")
     open_diary
+    ;;
+  "  Todo list")
+    edit_todo
     ;;
   esac
 }
