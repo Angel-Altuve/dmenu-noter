@@ -8,7 +8,6 @@ MENU="dmenu -c -l 10 -p"
 # <<------ Directories ------>> #
 book_library="/path/to/books/"
 note_library="/path/to/notes/"
-template_library="/path/to/note/templates/"
 article_library="/path/to/articles/"
 diary="/path/to/diary/"
 todo_list="/path/to/todo_list"
@@ -21,7 +20,7 @@ server=backup-server.example.com
 
 # <<------ Options ------>> #
 declare -A actions
-actions["📑 Create Note"]=$template_library
+actions["📑 Create Note"]=$note_library
 actions["🔖 View Notes"]=$note_library
 actions["📚 Books"]=$book_library
 actions["📜 Articles"]=$article_library
