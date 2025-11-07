@@ -63,7 +63,7 @@ create_document() {
     ;;
   esac
 
-  cn_name=$($MENU "Enter a name for the note:")
+  cn_name=$(echo "" | $MENU "Enter a name for the note:")
 
   if [ -z "$cn_name" ]; then
     return
