@@ -28,8 +28,12 @@ You can put your note templates inside the templates directory.
 Dmenu Noter is customizable to suit your needs. You can change the following
 parameters in the script:
 
-- **directory**: For each Functionality - **EDITOR**: The file editor you
-want to open your files in - **TERMINAL**: The terminal you want to open
+- **directory**: For each Functionality
+
+- **EDITOR**: The file editor you
+want to open your files in
+
+- **TERMINAL**: The terminal you want to open
 your notes in
 
 ## Dependencies
@@ -37,7 +41,10 @@ your notes in
 Before using Dmenu Noter, make sure the following dependencies are installed
 on your system:
 
-- dmenu - zathura - rsync - ripgrep
+- dmenu
+- zathura
+- rsync
+- ripgrep
 
 ## Installation
 
