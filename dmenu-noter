@@ -188,7 +188,7 @@ search() {
   esac
 }
 
-# <<------ Misc ------>>
+# <<------ Misc ------>> #
 
 select_and_open() {
   local dir exts cmd file full
