@@ -12,8 +12,10 @@ To use Dmenu Noter, simply run the command rofi-noter in your terminal. This wil
 - 🔖 View Notes
 - 📚 View Library
 - 📜 View Articles
--  Sync
-- 󰌱 Diary
+- 🔄 Sync
+- 📔 Diary
+- 🔍 Search
+- 🖨️ Print
 
 You can put your note templates inside the templates directory.
 
@@ -29,9 +31,10 @@ Dmenu Noter is customizable to suit your needs. You can change the following par
 
 Before using Dmenu Noter, make sure the following dependencies are installed on your system:
 
-- [dmenu]
-- [zathura]
-- [rsync]
+- dmenu
+- zathura
+- rsync
+- ripgrep
 
 ## Installation
 
